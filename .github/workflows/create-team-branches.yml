@@ -3,11 +3,11 @@ name: Create Branch on Label
 on:
   pull_request:
     types:
-      - labeled
+      - labeled  # Triggers when any label is added to a PR
 
 jobs:
   create_branch:
-    if: contains(github.event.label.name, 'merge-done')
+    if: github.event.label.name == 'merge-done'  # Checks for "merge-done" label specifically
     runs-on: ubuntu-latest
 
     steps:
@@ -16,14 +16,28 @@ jobs:
         with:
           fetch-depth: 0  # Fetch all branches and history
 
+      - name: Fetch all remote branches
+        run: |
+          git remote set-url origin https://github.com/${{ github.repository }}.git
+          git fetch --all  # Fetch all branches from the remote
+
+      - name: Verify and Checkout Dev
+        run: |
+          if git show-ref --verify --quiet refs/remotes/origin/dev; then
+            git checkout dev
+          else
+            echo "Branch 'dev' does not exist in the remote repository."
+            exit 1
+          fi
+
       - name: Configure Git
         run: |
-          git config user.name "android-bot"
-          git config user.email "ag7aka@gmail.com"
+          git config user.name "Your Custom Bot Name"
+          git config user.email "your-custom-email@example.com"
 
-      - name: Create new branch from PR base branch
+      - name: Create new branch from dev
         env:
           BRANCH_NAME: "feature/${{ github.event.pull_request.number }}"  # Custom branch name
         run: |
-          git checkout -b "$BRANCH_NAME" "${{ github.event.pull_request.base.ref }}"
+          git checkout -b "$BRANCH_NAME"  # Create new branch from dev
           git push origin "$BRANCH_NAME"
