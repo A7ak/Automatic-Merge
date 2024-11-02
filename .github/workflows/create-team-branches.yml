@@ -45,8 +45,11 @@ jobs:
           if git show-ref --verify --quiet refs/heads/$BRANCH_NAME; then
             echo "Branch '$BRANCH_NAME' already exists."
           else
-            git checkout -b "$BRANCH_NAME"  # Create new branch from dev
-            git push origin "$BRANCH_NAME"
+            echo "Creating new branch '$BRANCH_NAME' from 'dev'."
+            git checkout -b "$BRANCH_NAME" dev || { echo "Failed to create branch"; exit 1; }
+            git pull origin dev || { echo "Failed to pull from dev"; exit 1; }
+            git push origin "$BRANCH_NAME" || { echo "Failed to push new branch"; exit 1; }
+            echo "Branch '$BRANCH_NAME' created and pushed successfully."
           fi
 
       - name: Load version from version.properties
@@ -71,13 +74,3 @@ jobs:
           git add version.properties
           git commit -m "Bump version to $NEW_VERSION_NAME on branch $BRANCH_NAME" || echo "No changes to commit"
           git push origin "$BRANCH_NAME"
-
-      # Uncomment to create a pull request if needed
-      # - name: Create Pull Request
-      #   uses: peter-evans/create-pull-request@v3
-      #   with:
-      #     token: ${{ secrets.TOKEN }}
-      #     branch: ${{ env.BRANCH_NAME }}
-      #     base: dev
-      #     title: "Version Bump"
-      #     body: "This PR bumps the version."
