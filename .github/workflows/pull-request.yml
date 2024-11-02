@@ -7,7 +7,7 @@ on:
 
 jobs:
   create_branch:
-    if: github.event.label.name == 'create-pr'  # Checks for "merge-done" label specifically
+    if: github.event.label.name == 'create-pr'  # Checks for "create-pr" label specifically
     runs-on: ubuntu-latest
 
     steps:
@@ -39,8 +39,8 @@ jobs:
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v3
         with:
-           title: "Feature PR"
-           body: "This PR includes changes for my feature."
-           head: feature/2
-           base: dev
-           token: ${{ secrets.TOKEN }}
+          title: "Feature PR"
+          body: "This PR includes changes for my feature."
+          branch: feature/2  # Use 'branch' instead of 'head'
+          base: dev
+          token: ${{ secrets.TOKEN }}
