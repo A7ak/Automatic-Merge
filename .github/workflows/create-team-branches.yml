@@ -42,3 +42,33 @@ jobs:
         run: |
           git checkout -b "$BRANCH_NAME"  # Create new branch from dev
           git push origin "$BRANCH_NAME"
+
+      - name: Load version from version.properties
+        id: load_version
+        run: |
+          VERSION_NAME=$(grep -oP '(?<=VERSION_NAME=).*' version.properties)
+          VERSION_CODE=$(grep -oP '(?<=VERSION_CODE=).*' version.properties)
+          echo "VERSION_NAME=$VERSION_NAME" >> $GITHUB_ENV
+          echo "VERSION_CODE=$VERSION_CODE" >> $GITHUB_ENV
+
+      - name: Bump version
+        run: |
+          NEW_VERSION_CODE=$((VERSION_CODE + 1))
+          NEW_VERSION_NAME=$(echo $VERSION_NAME | awk -F. -v OFS=. '{$NF++; print}')
+          echo "VERSION_NAME=$NEW_VERSION_NAME" > version.properties
+          echo "VERSION_CODE=$NEW_VERSION_CODE" >> version.properties
+
+      - name: Commit version bump
+        run: |
+          git add version.properties
+          git commit -m "Bump version to $NEW_VERSION_NAME" || echo "No changes to commit"
+          git push origin "$BRANCH_NAME"
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v3
+        with:
+          token: ${{ secrets.TOKEN }}
+          branch: ${{ env.BRANCH_NAME }}
+          base: dev
+          title: "Version Bump"
+          body: "This PR bumps the version."
