@@ -11,6 +11,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0  # Fetch all branches and history
+          token: ${{ secrets.TOKEN }}  # Use GitHub token for permissions
+
       - name: Configure Git
         run: |
           git config user.name "Android-bot"
