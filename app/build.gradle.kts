@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -8,12 +10,22 @@ android {
     namespace = "com.example.automaticmerge"
     compileSdk = 34
 
+    // Load version properties file
+    val versionPropsFile = rootProject.file("version.properties")
+    val versionProps = Properties().apply {
+        load(versionPropsFile.inputStream())
+    }
+
+// Extract version code and name
+    val versionCode = versionProps["VERSION_CODE"].toString().toInt()
+    val versionName = versionProps["VERSION_NAME"].toString()
+
     defaultConfig {
         applicationId = "com.example.automaticmerge"
         minSdk = 24
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        this.versionCode = versionCode
+        this.versionName = versionName
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
