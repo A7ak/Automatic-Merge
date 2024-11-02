@@ -11,26 +11,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0  # Fetch all branches and history
-          token: ${{ secrets.TOKEN }}  # Use GitHub token for permissions
-
-      - name: Fetch all remote branches
-        run: |
-          git remote set-url origin "https://x-access-token:${{ secrets.TOKEN }}@github.com/${{ github.repository }}.git"
-          git fetch --all  # Fetch all branches from the remote
-
-      - name: Verify and Checkout Dev
-        run: |
-          if git show-ref --verify --quiet refs/remotes/origin/dev; then
-            git checkout dev
-          else
-            echo "Branch 'dev' does not exist in the remote repository."
-            exit 1
-          fi
-
       - name: Configure Git
         run: |
           git config user.name "Android-bot"
