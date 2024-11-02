@@ -51,15 +51,17 @@ jobs:
           echo "VERSION_NAME=$VERSION_NAME" >> $GITHUB_ENV
           echo "VERSION_CODE=$VERSION_CODE" >> $GITHUB_ENV
 
-      - name: Bump version
+      - name: Bump version and commit changes
         run: |
+          # Increment version code and version name
           NEW_VERSION_CODE=$((VERSION_CODE + 1))
           NEW_VERSION_NAME=$(echo $VERSION_NAME | awk -F. -v OFS=. '{$NF++; print}')
+          
+          # Update version properties file
           echo "VERSION_NAME=$NEW_VERSION_NAME" > version.properties
           echo "VERSION_CODE=$NEW_VERSION_CODE" >> version.properties
-
-      - name: Commit version bump
-        run: |
+          
+          # Commit and push changes
           git add version.properties
           git commit -m "Bump version to $NEW_VERSION_NAME" || echo "No changes to commit"
           git push origin "$BRANCH_NAME"
