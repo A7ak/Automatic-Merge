@@ -6,7 +6,7 @@ on:
       - labeled  # Triggers when any label is added to a PR
 
 jobs:
-  create_branch:
+  create_pr:
     if: github.event.label.name == 'create-pr'  # Checks for "create-pr" label specifically
     runs-on: ubuntu-latest
 
